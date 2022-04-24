@@ -32,6 +32,9 @@ class RofiMode:
     def menu_no_input(self, val: bool = True) -> str:
         return "\0no-custom\x1f" + ("true" if val else "false")
 
+    def menu_header_data(self, data: str = "") -> str:
+        return f"\0data\x1f{data}"
+
     def _menu_entry(self, text, **fields):
         if not fields:
             return text
@@ -66,11 +69,18 @@ class RofiMode:
 
         return self._menu_entry(text, **fields)
 
+    def meta_to_header(self, meta: dict) -> str:
+        return self.menu_header_data(base64.urlsafe_b64encode(json.dumps(meta).encode("utf-8")).decode("utf-8"))
+
     def parse_meta(self, selected_item: str) -> dict:
         rofi_retv = os.getenv("ROFI_RETV")
+        rofi_data = os.getenv("ROFI_DATA")
         rofi_info = os.getenv("ROFI_INFO")
 
+        if rofi_data:
+            data = json.loads(base64.urlsafe_b64decode(rofi_data))
+        else:
+            data = dict()
         if rofi_retv == ROFI_RETV_SELECTED_ENTRY and rofi_info:
-            return json.loads(base64.urlsafe_b64decode(rofi_info))
-
-        return {}
+            data.update(json.loads(base64.urlsafe_b64decode(rofi_info)))
+        return data

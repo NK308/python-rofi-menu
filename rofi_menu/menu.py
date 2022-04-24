@@ -320,6 +320,7 @@ class Menu:
             meta.rofi_mode.menu_prompt(self.prompt),
             meta.rofi_mode.menu_enable_markup(),
             meta.rofi_mode.menu_no_input(not self.allow_user_input),
+            meta.rofi_mode.meta_to_header(meta.as_dict())
         ]
 
         for num, item in enumerate(self.items):
@@ -328,14 +329,13 @@ class Menu:
             if constants.FLAG_STYLE_URGENT in item.flags:
                 _rofi_menu.append(meta.rofi_mode.menu_urgent(num))
 
-        shared_meta = meta.as_dict()
         _rofi_menu.extend(
             meta.rofi_mode.menu_item(
                 text=text,
                 icon=item.icon,
                 searchable_text=item.searchable_text,
                 nonselectable=item.nonselectable,
-                meta_data={**shared_meta, "text": text, "id": item.id},
+                meta_data={"text": text, "id": item.id},
             )
             for text, item in zip(rendered_items, self.items)
         )
