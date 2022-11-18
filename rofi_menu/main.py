@@ -18,16 +18,26 @@ def _output_menu(data: str, meta: MetaStore) -> None:
 async def main(menu: Menu, meta: MetaStore) -> None:
     menu = await menu.build(menu_id=[ROOT_MENU_ID], meta=meta)
 
-    if meta.raw_script_input:
-        if meta.selected_id:
-            # User selected a menu item, so we'll need to find corresponding
-            # menu item and delegate handling of selection.
-            meta.log(f"=> [rofi menu] User selected item: {meta.selected_id}")
-            op = await menu.propagate_select(meta)
-        else:
-            # User entered a text and hasn't selected any menu item.
-            meta.log(f"=> [rofi menu] User entered text: {meta.user_input}")
-            op = await menu.propagate_user_input(meta)
+    if meta["ACTION"] == "INITIAL_SCRIPT_CALL":
+        _output_menu(await menu.handle_render(meta), meta)
+    elif meta["ACTION"] == "ENTRY_SELECTED":
+        # User selected a menu item, so we'll need to find corresponding
+        # menu item and delegate handling of selection.
+        meta.log(f"=> [rofi menu] User selected item: {meta.selected_id}")
+        op = await menu.propagate_select(meta)
+        meta.log(f"=> [rofi menu result] Operation: {op.code}")
+        meta.log(f"=> [rofi menu result] Data: {op.data!r}")
+
+        if op.code == OP_OUTPUT:
+            _output_menu(op.data, meta)
+
+        elif op.code == OP_EXIT:
+            # It'll take an effect on Rofi only if stdout is empty
+            exit(op.data or 1)
+    elif meta["ACTION"] == "CUSTOM_ENTRY":
+        # User entered a text and hasn't selected any menu item.
+        meta.log(f"=> [rofi menu] User entered text: {meta.user_input}")
+        op = await menu.propagate_user_input(meta)
 
         meta.log(f"=> [rofi menu result] Operation: {op.code}")
         meta.log(f"=> [rofi menu result] Data: {op.data!r}")
@@ -38,9 +48,10 @@ async def main(menu: Menu, meta: MetaStore) -> None:
         elif op.code == OP_EXIT:
             # It'll take an effect on Rofi only if stdout is empty
             exit(op.data or 1)
-
     else:
-        _output_menu(await menu.handle_render(meta), meta)
+        # TODO custom key
+        pass
+
 
 
 def run(

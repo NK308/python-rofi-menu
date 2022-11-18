@@ -109,6 +109,7 @@ class Item:
     text: Optional[str] = None
     searchable_text: Optional[str] = None
     nonselectable: Optional[bool] = False
+    item_meta: Optional[dict] = None
     flags: Set
     parent_menu: Optional[Menu]
 
@@ -135,6 +136,7 @@ class Item:
         self.icon = kwargs.get("icon", self.icon)
         self.searchable_text = kwargs.get("searchable_text", self.searchable_text)
         self.nonselectable = kwargs.get("nonselectable", self.nonselectable)
+        self.item_meta = kwargs.get("item_meta") or dict()
         self.flags = kwargs.get("flags") or set()
 
         # filled after attaching to menu
@@ -363,6 +365,10 @@ class Menu:
             meta.rofi_mode.menu_enable_markup(),
             meta.rofi_mode.menu_no_input(not self.allow_user_input),
         ]
+        shared_meta = meta.as_dict().copy()
+        del shared_meta["ACTION"]
+        del shared_meta["ITEM_META"]
+        _rofi_menu.append(meta.rofi_mode.menu_global_meta(shared_meta))
 
         for num, item in enumerate(self.items):
             if constants.FLAG_STYLE_ACTIVE in item.flags:
@@ -370,14 +376,13 @@ class Menu:
             if constants.FLAG_STYLE_URGENT in item.flags:
                 _rofi_menu.append(meta.rofi_mode.menu_urgent(num))
 
-        shared_meta = meta.as_dict()
         _rofi_menu.extend(
             meta.rofi_mode.menu_item(
                 text=text,
                 icon=item.icon,
                 searchable_text=item.searchable_text,
                 nonselectable=item.nonselectable,
-                meta_data={**shared_meta, "text": text, "id": item.id},
+                meta_data={**item.item_meta, "text": text, "id": item.id},
             )
             for text, item in zip(rendered_items, self.items)
         )
