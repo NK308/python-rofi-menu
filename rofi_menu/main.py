@@ -58,7 +58,7 @@ def run(
     menu: Menu,
     stateful: Union[bool, str] = True,
     middlewares=None,
-    rofi_version="1.6",
+    rofi_version="1.7.4",
     debug: bool = False,
 ) -> None:
     """Shortcut for running menu generation."""
