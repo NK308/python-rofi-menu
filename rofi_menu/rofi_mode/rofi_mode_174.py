@@ -78,7 +78,7 @@ class RofiMode:
         if rofi_retv != ROFI_RETV_INITIAL_SCRIPT_CALL and rofi_data:
             meta = json.loads(base64.urlsafe_b64decode(rofi_data))
         else:
-            {}
+            meta = {}
         if rofi_retv == ROFI_RETV_INITIAL_SCRIPT_CALL:
             meta["ACTION"] = "INITIAL_SCRIPT_CALL"
         elif rofi_retv == ROFI_RETV_SELECTED_ENTRY:
