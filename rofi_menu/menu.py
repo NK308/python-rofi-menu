@@ -102,6 +102,10 @@ class Operation:
     def exit(cls):
         return cls(constants.OP_EXIT)
 
+    @classmethod
+    def switch_menu_tree(cls):
+        return cls(constants.OP_SWITCH_MENU_TREE)
+
 
 class Item:
     id: ItemId
