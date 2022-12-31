@@ -439,3 +439,20 @@ class Menu:
 
     async def on_user_input(self, meta: MetaStore):
         return Operation.refresh_menu()
+
+
+
+class LazyMenu(Menu):
+    initialized: bool = False
+
+    async def build(self, menu_id, meta: MetaStore):
+        pass
+
+    async def lazy_build(self, menu_id, meta: MetaStore):
+        pass
+
+    async def generate_menu_items(self, meta: MetaStore):
+        pass
+
+    async def build_menu_items(self, meta: MetaStore):
+        pass
