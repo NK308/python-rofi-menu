@@ -163,7 +163,7 @@ class Item:
         It also links item to concreate menu, assigns an id and returns "bound" element.
         """
         obj = self.clone()
-        obj.id = obj.id or (
+        obj.id = obj.id or ItemId(
             item_id if isinstance(item_id, list) else [*parent_menu.id, item_id]
         )
         obj.parent_menu = parent_menu
